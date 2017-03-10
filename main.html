@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Listen to Me</title>
+</head>
+<body>
+    <center><svg id = "slate" height="500" width="500">
+    </svg></center>
+    <center><button id="move">Move</button></center>
+    <center><button id="clear">Clear</button></center>
+    </body>
+
+    <style>
+
+    /*aesthetic*/
+    #slate{
+        border: 2px solid black;
+        background-color: #D0A9F5;
+    }
+    body{
+        background-color: #E3CEF6;
+    }
+
+    </style>
+
+    <script>
+
+        //declarations
+        var pic = document.getElementById("slate");
+        var clearButton = document.getElementById('clear');
+        var moveButton = document.getElementById('move');
+        var width = 500;
+        var height = 500;
+        var r = 25;
+
+        var intervalId;
+
+        var move = function(event){
+
+            clearInterval(intervalId);
+
+            var move = function(){
+                var circles = pic.children;
+                for (var i = 0; i < circles.length; i++){
+
+                    var x = circles[i].getAttribute("cx");
+                    var y = circles[i].getAttribute("cy");
+
+                    var newx = parseInt(x) + parseInt(circles[i].getAttribute("mvx"));
+                    var newy = parseInt(y) + parseInt(circles[i].getAttribute("mvy"));
+                    //console.log(newx);
+                    //console.log(newy);
+
+                    circles[i].setAttribute("cx",newx);
+                    circles[i].setAttribute("cy",newy);
+
+                    if (newx + r/2>= width){
+                        circles[i].setAttribute("mvx",-5*Math.random());
+                    }
+                    else if (newx - r/2 <= 0){
+                        circles[i].setAttribute("mvx",5*Math.random());
+                    }
+
+                    if (newy + r/2>= height){
+                        circles[i].setAttribute("mvy",-5*Math.random());
+                    }
+                    else if (newy - r/2<= 0){
+                        circles[i].setAttribute("mvy",5*Math.random());
+                    }
+                }
+            }
+
+            intervalId = setInterval(move,30);
+        };
+
+        var circle = function(x,y){
+
+            var c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+
+            c.setAttribute("cx",x);
+            c.setAttribute("cy",y);
+            c.setAttribute("r",r);
+            c.setAttribute("fill","blue");
+            c.setAttribute("stroke","black");
+            c.setAttribute("mvx",Math.random()*5);
+            c.setAttribute("mvy",Math.random()*5);
+
+            c.addEventListener('click',changeColor);
+
+            return c;
+        };
+
+        var addCircle = function(event){
+            var x = event.offsetX;
+            var y = event.offsetY;
+
+            var c = circle(x,y);
+
+            pic.appendChild(c);
+
+        };
+
+        var changeColor = function(event){
+            event.preventDefault();
+            event.stopPropagation();
+            //console.log(event);
+
+            if (event.target.getAttribute("fill") == "green"){
+                pic.removeChild(event.target);
+                var c = circle(Math.random() * 500,Math.random() * 500);
+                pic.append(c);
+            }
+            else{
+                event.target.setAttribute("fill","green");
+            };
+
+
+        };
+
+        var clear = function(){
+            clearInterval(intervalId);
+            while (pic.childNodes.length > 0){
+                pic.removeChild(pic.firstChild);
+            }
+        };
+
+        clearButton.addEventListener('click',clear);
+        moveButton.addEventListener('click',move);
+        pic.addEventListener('click',addCircle);
+
+    </script>
+
+</body>
+</html>
